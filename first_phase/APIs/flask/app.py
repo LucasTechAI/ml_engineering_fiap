@@ -1,34 +1,40 @@
-from typing import Tuple, Optional, Dict, Any
-from flask import jsonify, Response
 import logging
+from flask import Flask
+from flask_jwt_extended import JWTManager
+from flasgger import Swagger
+from settings.config import Config
 
-logger = logging.getLogger(__name__)
+from models.models import db
+from routes.user_routes import register_user_routes
+from routes.recipe_routes import recipe_bp
 
-def validate_json_fields(
-    data: Optional[Dict[str, Any]], 
-    required_fields: list[str]
-) -> Tuple[Optional[Dict[str, Any]], Optional[Tuple[Response, int]]]:
-    """
-    Valida se o JSON recebido contém os campos obrigatórios.
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(Config)
 
-    Args:
-        data (Optional[Dict[str, Any]]): Dicionário contendo os dados JSON da requisição.
-        required_fields (list[str]): Lista de campos obrigatórios que devem estar presentes em `data`.
+    logging.basicConfig(
+        level=logging.INFO,  
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    )
+    logger = logging.getLogger(__name__)
+    logger.info("Starting Flask application...")
 
-    Returns:
-        Tuple[Optional[Dict[str, Any]], Optional[Tuple[Response, int]]]:
-            - Primeiro elemento: o próprio `data` se válido, ou None se inválido.
-            - Segundo elemento: None se válido, ou uma tupla com a resposta JSON de erro e o código HTTP 400 se inválido.
+    db.init_app(app)
 
-    """
-    if not data:
-        logger.error("Validation error: No data provided")
-        return None, (jsonify({"message": "No data provided"}), 400)
-    
-    missing = [field for field in required_fields if field not in data]
-    if missing:
-        logger.error(f"Validation error: Missing fields: {missing}")
-        return None, (jsonify({"message": f"Missing fields: {missing}"}), 400)
+    JWTManager(app)
+    Swagger(app)
 
-    logger.info("JSON validation passed")
-    return data, None
+    register_user_routes(app)
+    app.register_blueprint(recipe_bp)
+
+    logger.info("Flask application setup complete.")
+    return app
+
+
+app = create_app()
+
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+        app.logger.info("Database tables created.")
+    app.run(debug=True, port=5000)
