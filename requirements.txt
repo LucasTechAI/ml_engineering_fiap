@@ -1,10 +1,11 @@
+# FastAPI
 fastapi
 uvicorn[standard]
 sqlalchemy
 passlib[bcrypt]
 fastapi-jwt-auth
 
-
+# Flask
 flask
 flask-jwt-extended
 flasgger
