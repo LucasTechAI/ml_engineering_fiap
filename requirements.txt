@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+passlib[bcrypt]
+fastapi-jwt-auth
+
+
+flask
+flask-jwt-extended
+flasgger
+flask-sqlalchemy
