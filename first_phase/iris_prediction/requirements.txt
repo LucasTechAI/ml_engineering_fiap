@@ -1,0 +1,15 @@
+fastapi==0.110.2
+uvicorn[standard]==0.29.0
+
+sqlalchemy==2.0.30
+pydantic==2.7.1
+pydantic-settings==2.2.1
+
+passlib[bcrypt]==1.7.4
+pyjwt==2.8.0
+
+joblib==1.4.2
+scikit-learn==1.4.2
+numpy==1.26.4
+
+fastapi-cache2==0.2.1
